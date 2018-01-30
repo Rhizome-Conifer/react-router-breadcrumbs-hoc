@@ -52,6 +52,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rollup -c",
+    "prepare": "npm run build",
     "test": "NODE_ENV=test jest",
     "travis": "jest && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "lint": "eslint ./src/**"
