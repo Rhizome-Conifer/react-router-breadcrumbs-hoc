@@ -14,12 +14,27 @@ const renderer = ({ breadcrumb, match }) => {
 
 export const getBreadcrumbs = ({ routes, pathname }) => {
   const matches = [];
+  const segments = [];
 
-  pathname
-    // remove trailing slash "/" from pathname (avoids multiple of the same match)
-    .replace(/\/$/, '')
-    // split pathname into sections
-    .split('/')
+  // remove trailing slash "/" from pathname unless it's a base route (avoids multiple of the same match)
+  let newPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+
+  while(newPath.length) {
+    // check whether next segment is a url fragment
+    if (newPath.startsWith('http')) {
+      segments.push(newPath);
+      newPath = '';
+    } else {
+      // grab next segment
+      const part = newPath.split('/', 1)[0];
+      segments.push(part);
+
+      // remove segment + slash from path
+      newPath = newPath.substr(part.length + 1);
+    }
+  }
+
+  segments
     // reduce over the sections and find matches from `routes` prop
     .reduce((previous, current) => {
       // combine the last route section with the current
@@ -30,9 +45,15 @@ export const getBreadcrumbs = ({ routes, pathname }) => {
       let breadcrumbMatch;
 
       routes.some(({ breadcrumb, matchOptions, path }) => {
-        if (!breadcrumb || !path) {
+        if (typeof breadcrumb === 'undefined' || !path) {
           throw new Error('withBreadcrumbs: `breadcrumb` and `path` must be provided in every route object');
         }
+
+        // allow omitting via falsy parameter
+        if (!breadcrumb) {
+          return false;
+        }
+
         const match = matchPath(pathSection, { ...(matchOptions || DEFAULT_MATCH_OPTIONS), path });
 
         // if a route match is found ^ break out of the loop with a rendered breadcumb
