@@ -16,11 +16,12 @@ export const getBreadcrumbs = ({ routes, pathname }) => {
   const matches = [];
   const segments = [];
 
-  // remove trailing slash "/" from pathname unless it's a base route (avoids multiple of the same match)
+  /* remove trailing slash "/" from pathname unless it's a base route
+     (avoids multiple of the same match) */
   let newPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
 
-  while(newPath.length) {
-    // check whether next segment is a url fragment
+  while (newPath.length) {
+    // check whether next segment is a splat matched url
     if (newPath.startsWith('http')) {
       segments.push(newPath);
       newPath = '';
@@ -44,7 +45,7 @@ export const getBreadcrumbs = ({ routes, pathname }) => {
 
       let breadcrumbMatch;
 
-      routes.some(({ breadcrumb, matchOptions, path }) => {
+      routes.some(({ breadcrumb, matchOptions, path, getLocation }) => {
         if (!path) {
           throw new Error('withBreadcrumbs: `path` must be provided in every route object');
         }
@@ -62,6 +63,7 @@ export const getBreadcrumbs = ({ routes, pathname }) => {
             breadcrumb: renderer({ breadcrumb, match }),
             path,
             match,
+            getLocation,
           };
           return true;
         }

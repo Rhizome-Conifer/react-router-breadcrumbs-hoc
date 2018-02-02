@@ -39,11 +39,12 @@ var getBreadcrumbs = function getBreadcrumbs(_ref2) {
   var matches = [];
   var segments = [];
 
-  // remove trailing slash "/" from pathname unless it's a base route (avoids multiple of the same match)
+  /* remove trailing slash "/" from pathname unless it's a base route
+     (avoids multiple of the same match) */
   var newPath = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
 
   while (newPath.length) {
-    // check whether next segment is a url fragment
+    // check whether next segment is a splat matched url
     if (newPath.startsWith('http')) {
       segments.push(newPath);
       newPath = '';
@@ -70,13 +71,13 @@ var getBreadcrumbs = function getBreadcrumbs(_ref2) {
     routes.some(function (_ref3) {
       var breadcrumb = _ref3.breadcrumb,
           matchOptions = _ref3.matchOptions,
-          path = _ref3.path;
+          path = _ref3.path,
+          getLocation = _ref3.getLocation;
 
-      if (typeof breadcrumb === 'undefined' || !path) {
-        throw new Error('withBreadcrumbs: `breadcrumb` and `path` must be provided in every route object');
+      if (!path) {
+        throw new Error('withBreadcrumbs: `path` must be provided in every route object');
       }
 
-      // allow omitting via falsy parameter
       if (!breadcrumb) {
         return false;
       }
@@ -89,7 +90,8 @@ var getBreadcrumbs = function getBreadcrumbs(_ref2) {
         breadcrumbMatch = {
           breadcrumb: renderer({ breadcrumb: breadcrumb, match: match }),
           path: path,
-          match: match
+          match: match,
+          getLocation: getLocation
         };
         return true;
       }
