@@ -45,11 +45,10 @@ export const getBreadcrumbs = ({ routes, pathname }) => {
       let breadcrumbMatch;
 
       routes.some(({ breadcrumb, matchOptions, path }) => {
-        if (typeof breadcrumb === 'undefined' || !path) {
-          throw new Error('withBreadcrumbs: `breadcrumb` and `path` must be provided in every route object');
+        if (!path) {
+          throw new Error('withBreadcrumbs: `path` must be provided in every route object');
         }
 
-        // allow omitting via falsy parameter
         if (!breadcrumb) {
           return false;
         }
